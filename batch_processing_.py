@@ -151,7 +151,15 @@ class BatchProcessing:
 
                     # Add global id column
                     csv_data.insert(loc=0, column='global_id', value='global_id')
-                    csv_data['global_id'] = csv_data['global_id'].apply(lambda x: self.global_id_tag_name + '_' + str(uuid.uuid4()))
+                    cursor.execute('select global_id, user_id from ecomm_new')
+                    compare_df = pd.DataFrame(cursor.fetchall(), columns=['global_id', 'user_id'])
+                    for id_ in range(self.steps_to_move):
+                        if csv_data['user_id'].iloc[id_] in compare_df['user_id']:
+                            csv_data['global_id'].iloc[id_] = compare_df[compare_df['user_id'] == csv_data['user_id'].iloc[id_]]['global_id'].iloc[0]
+                        if:
+                        else:
+                            csv_data['global_id'].iloc[id_] = self.global_id_tag_name + '_' + str(uuid.uuid4())
+                    # csv_data['global_id'] = csv_data['global_id'].apply(lambda x: self.global_id_tag_name + '_' + str(uuid.uuid4()))
 
                     val = list(csv_data.itertuples(index=False, name=None))
                     cursor.executemany(self.insert_table, val)
@@ -160,7 +168,7 @@ class BatchProcessing:
                     inserted_rows = f'0-{count+self.steps_to_move}'
                     return status, inserted_rows
                 else:
-                    self.logger.info("Inserting next %s rows to the table",steps_to_move)
+                    self.logger.info("Inserting next %s rows to the table", steps_to_move)
                     csv_data = pd.read_csv(self.file_path, skiprows=self.steps_to_move * count, nrows=self.steps_to_move)
                     csv_data.drop(csv_data.iloc[:, 0:1], inplace=True, axis=1)
                     csv_data.columns = self.column_names
@@ -172,7 +180,14 @@ class BatchProcessing:
 
                     # Add global id column
                     csv_data.insert(loc=0, column='global_id', value='global_id')
-                    csv_data['global_id'] = csv_data['global_id'].apply(lambda x: self.global_id_tag_name + '_' + str(uuid.uuid4()))
+                    cursor.execute('select global_id, user_id from ecomm_new')
+                    compare_df = pd.DataFrame(cursor.fetchall(), columns=['global_id', 'user_id'])
+                    for id_ in range(self.steps_to_move):
+                        if csv_data['user_id'].iloc[id_] in compare_df['user_id']:
+                            csv_data['global_id'].iloc[id_] = compare_df[compare_df['user_id'] == csv_data['user_id'].iloc[id_]]['global_id'].iloc[0]
+                        else:
+                            csv_data['global_id'].iloc[id_] = self.global_id_tag_name + '_' + str(uuid.uuid4())
+                    # csv_data['global_id'] = csv_data['global_id'].apply(lambda x: self.global_id_tag_name + '_' + str(uuid.uuid4()))
 
                     val = list(csv_data.itertuples(index=False, name=None))
                     cursor.executemany(self.insert_table, val)
@@ -183,7 +198,10 @@ class BatchProcessing:
             # Check if file is in json or parquet format
             elif self.file_path.endswith('.parquet') or self.file_path.endswith('.json'):
                 self.logger.info("Checking file is in parquet format or json format")
-                parquet_or_json_data = pd.read_parquet(self.file_path)
+                if self.file_path.endswith('.parquet'):
+                    parquet_or_json_data = pd.read_parquet(self.file_path)
+                elif self.file_path.endswith('.json'):
+                    parquet_or_json_data = pd.read_json(self.file_path)
                 if count == 0:
                     self.logger.info("Inserting first %s rows in the table", steps_to_move)
                     parquet_or_json_data = parquet_or_json_data.iloc[:self.steps_to_move]
