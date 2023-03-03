@@ -155,8 +155,11 @@ class BatchProcessing:
                     compare_df = pd.DataFrame(cursor.fetchall(), columns=['global_id', 'user_id'])
                     for id_ in range(self.steps_to_move):
                         if csv_data['user_id'].iloc[id_] in compare_df['user_id']:
-                            csv_data['global_id'].iloc[id_] = compare_df[compare_df['user_id'] == csv_data['user_id'].iloc[id_]]['global_id'].iloc[0]
-                        if:
+                            csv_data['global_id'].iloc[id_] = \
+                                compare_df[compare_df['user_id'] == csv_data['user_id'].iloc[id_]]['global_id'].iloc[0]
+                        elif csv_data['global_id'].iloc[id_] in csv_data['global_id'].iloc[:csv_data['global_id'].iloc[id_], :]:
+                            csv_data['global_id'].iloc[id_] = \
+                                csv_data[csv_data['user_id'] == csv_data['user_id'].iloc[id_]]['global_id'].iloc[0]
                         else:
                             csv_data['global_id'].iloc[id_] = self.global_id_tag_name + '_' + str(uuid.uuid4())
                     # csv_data['global_id'] = csv_data['global_id'].apply(lambda x: self.global_id_tag_name + '_' + str(uuid.uuid4()))
@@ -184,7 +187,11 @@ class BatchProcessing:
                     compare_df = pd.DataFrame(cursor.fetchall(), columns=['global_id', 'user_id'])
                     for id_ in range(self.steps_to_move):
                         if csv_data['user_id'].iloc[id_] in compare_df['user_id']:
-                            csv_data['global_id'].iloc[id_] = compare_df[compare_df['user_id'] == csv_data['user_id'].iloc[id_]]['global_id'].iloc[0]
+                            csv_data['global_id'].iloc[id_] = \
+                                compare_df[compare_df['user_id'] == csv_data['user_id'].iloc[id_]]['global_id'].iloc[0]
+                        elif csv_data['global_id'].iloc[id_] in csv_data['global_id'].iloc[:csv_data['global_id'].iloc[id_], :]:
+                            csv_data['global_id'].iloc[id_] = \
+                                csv_data[csv_data['user_id'] == csv_data['user_id'].iloc[id_]]['global_id'].iloc[0]
                         else:
                             csv_data['global_id'].iloc[id_] = self.global_id_tag_name + '_' + str(uuid.uuid4())
                     # csv_data['global_id'] = csv_data['global_id'].apply(lambda x: self.global_id_tag_name + '_' + str(uuid.uuid4()))
